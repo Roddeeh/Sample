@@ -1,0 +1,41 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+</div>
+<!DOCTYPE html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trade Statistics</title>
+</head>
+<div id="statistics">
+    <p>Average Trades Per Minute: <span id="averageTrades"></span></p>
+    <p>Average Volume Per Minute: <span id="averageVolume"></span></p>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/5.0.11/signalr.min.js"></script>
+<script>
+    $(document).ready(function () {
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl("/statisticHub")
+            .configureLogging(signalR.LogLevel.Information)
+            .build();
+
+        connection.start().then(function () {
+            console.log("Connected to SignalR Hub");
+        }).catch(function (err) {
+            return console.error(err.toString());
+        });
+
+        connection.on("UpdateAverageTradeStatistic", function (statistics) {
+            console.log("new average trade value: ", statistics.averageTradesPerMinute)
+            console.log("new average volume value: ", statistics.averageVolumePerMinute)
+            $("#averageTrades").text(statistics.averageTradesPerMinute);
+            $("#averageVolume").text(statistics.averageVolumePerMinute);
+        });
+    });
+</script>
